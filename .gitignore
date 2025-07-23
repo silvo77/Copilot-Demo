@@ -1,0 +1,35 @@
+archive/chapters.py
+archive/extract_metadata.py
+archive/extract_titles_from_video.py
+archive/find_text_in_video_stream.py
+__pycache__/chapter_manager.cpython-313.pyc
+__pycache__/find_text_in_video.cpython-313.pyc
+__pycache__/lecture_parser.cpython-313.pyc
+archive/main.py
+archive/new_session_parser.py
+archive/session_parser.py
+ffmpeg/avcodec-62.dll
+ffmpeg/avdevice-62.dll
+ffmpeg/avfilter-11.dll
+ffmpeg/avformat-62.dll
+ffmpeg/avutil-60.dll
+ffmpeg/ffmpeg.exe
+ffmpeg/ffplay.exe
+ffmpeg/ffprobe.exe
+ffmpeg/swresample-6.dll
+ffmpeg/swscale-9.dll
+logs/lecture_parser_20250723_072707.log
+logs/lecture_parser_20250723_072947.log
+logs/lecture_parser_20250723_085954.log
+logs/lecture_parser_20250723_120345.log
+logs/lecture_parser_20250723_133410.log
+logs/Section 1-9_20250723_133410.log
+logs/Section 13-14_20250723_070947.log
+logs/Section 13-14_20250723_070957.log
+logs/Section 13-14_20250723_071319.log
+logs/Section 15-16_20250723_072707.log
+logs/Section 15-16_20250723_085954.log
+logs/Section 17_20250723_072947.log
+logs/Section 18-20_20250723_120345.log
+FFMETADATAFILE.txt
+timestamps.csv
