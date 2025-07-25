@@ -40,7 +40,8 @@ def add_video_chapters(video_file: str, lectures: List[Lecture], timestamps: Lis
 def find_lecture_timestamps(video_file: str, lectures: List[Lecture], search_window: float = 300, 
                         crop_area: Optional[Tuple[int, int, int, int]] = None,
                         truncate_length: Optional[int] = None,
-                        save_frames: bool = False) -> List[Tuple[float, float]]:
+                        save_frames: bool = False,
+                        strip_prefix: bool = False) -> List[Tuple[float, float]]:
     """
     Cerca i timestamp di inizio e fine di ogni lezione nel video.
     
@@ -69,7 +70,8 @@ def find_lecture_timestamps(video_file: str, lectures: List[Lecture], search_win
         
         # Prepara il testo da cercare
         search_text = lecture.title
-        if lecture.type.lower() == "doc":
+        # Rimuovi la parte iniziale fino al primo spazio se richiesto o se è una lezione di tipo doc
+        if strip_prefix or lecture.type.lower() == "doc":
             # Rimuovi la parte iniziale fino al primo spazio (es: "150. " da "150. Introduction")
             search_text = lecture.title.split(" ", 1)[1] if " " in lecture.title else lecture.title
         
@@ -191,6 +193,8 @@ def main():
                        help='Tronca il testo di ricerca ai primi N caratteri')
     parser.add_argument('--save-frames', action='store_true',
                        help='Salva le immagini dei frame dove viene trovato il testo')
+    parser.add_argument('--strip-prefix', action='store_true',
+                       help='Rimuovi il testo fino al primo spazio per tutte le lezioni')
     
     args = parser.parse_args()
     
@@ -236,7 +240,8 @@ def main():
         args.window,
         crop_area=args.crop,
         truncate_length=args.truncate,
-        save_frames=args.save_frames
+        save_frames=args.save_frames,
+        strip_prefix=args.strip_prefix
     )
     
     # Esporta in CSV

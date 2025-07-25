@@ -5,6 +5,7 @@ from pathlib import Path
 import argparse
 import sys
 import logging
+import re
 from datetime import datetime
 import os
 
@@ -60,26 +61,56 @@ class CourseParser:
     def parse_excel(self, file_path: str | Path) -> List[Lecture]:
         """Legge il file Excel e crea la lista delle lezioni"""
         logging.info(f"Inizio parsing del file Excel: {file_path}")
-        # Leggi solo le colonne necessarie: A, B e D
+        def parse_duration(duration_str: str) -> int:
+            """Converte una stringa di durata in minuti"""
+            if pd.isna(duration_str):
+                return 0
+            
+            duration_str = str(duration_str).strip().lower()
+            if not duration_str:
+                return 0
+
+            # Se contiene '|', prendi la parte dopo il '|'
+            if '|' in duration_str:
+                duration_str = duration_str.split('|')[-1].strip()
+
+            total_minutes = 0
+            
+            # Cerca ore
+            hour_match = re.search(r'(\d+)\s*hr?', duration_str)
+            if hour_match:
+                total_minutes += int(hour_match.group(1)) * 60
+            
+            # Cerca minuti
+            min_match = re.search(r'(\d+)\s*min', duration_str)
+            if min_match:
+                total_minutes += int(min_match.group(1))
+            
+            # Se non abbiamo trovato né ore né minuti, cerca solo numeri
+            if total_minutes == 0:
+                numbers = re.findall(r'\d+', duration_str)
+                if numbers:
+                    # Assume che il primo numero sia minuti
+                    total_minutes = int(numbers[0])
+            
+            if total_minutes == 0:
+                logging.warning(f"Impossibile interpretare la durata: '{duration_str}', usando 0 minuti")
+            
+            return total_minutes
+
+        # Leggi solo le colonne necessarie: A, B e C
         df = pd.read_excel(
             file_path, 
-            usecols=[0, 1, 3],  # A=0, B=1, D=3
+            usecols=[0, 1, 2],  # A=0, B=1, C=2
             names=['type', 'title', 'duration']
         )
         
         # Processa ogni riga
         for _, row in df.iterrows():
             try:
-                # Converti la durata in intero, gestendo valori non numerici
-                duration_str = str(row['duration'])
-                try:
-                    duration = int(duration_str)
-                except ValueError:
-                    # Se non è un numero, prova a estrarre il primo numero trovato
-                    import re
-                    numbers = re.findall(r'\d+', duration_str)
-                    duration = int(numbers[0]) if numbers else 0
-                    logging.warning(f"Durata non numerica trovata: '{duration_str}', convertita in {duration}")
+                # Converti la durata usando la nuova funzione
+                duration = parse_duration(row['duration'])
+                logging.debug(f"Durata convertita: '{row['duration']}' → {duration} minuti")
 
                 if row['type'].lower() == 'section':
                     self._current_section += 1
