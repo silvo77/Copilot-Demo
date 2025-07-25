@@ -42,14 +42,8 @@ def seconds_to_hms(seconds: float) -> str:
 
 def preprocess_image(image, crop_area=None):
     """
-    Preprocess image for better OCR results:
+    Preprocess image for OCR:
     - Crop to region of interest (if specified)
-    - Convert to grayscale
-    - Enhance contrast and brightness
-    - Apply multiple sharpening passes
-    - Dilate to connect broken text
-    - Resize (2x)
-    - Apply threshold for better text separation
     
     Args:
         image: PIL Image object
@@ -64,34 +58,7 @@ def preprocess_image(image, crop_area=None):
         bottom = int(height * crop_area[3] / 100)
         image = image.crop((left, top, right, bottom))
     
-    # Convert to grayscale
-    gray = image.convert('L')
-    
-    # Enhance contrast
-    contrast_enhancer = ImageEnhance.Contrast(gray)
-    gray_enhanced = contrast_enhancer.enhance(1.0)  # Increased contrast
-    
-    # Enhance brightness
-    brightness_enhancer = ImageEnhance.Brightness(gray_enhanced)
-    bright_enhanced = brightness_enhancer.enhance(1.0)
-    
-    # Multiple sharpening passes
-    sharpened = bright_enhanced
-    for _ in range(2):
-        sharpened = sharpened.filter(ImageFilter.SHARPEN)
-    
-    # Apply dilation to connect broken text
-    dilated = sharpened.filter(ImageFilter.MaxFilter(3))
-    
-    # Resize
-    width, height = dilated.size
-    resized = dilated.resize((width*2, height*2), Image.LANCZOS)
-    
-    # Apply threshold for better text/background separation
-    threshold = 180  # Adjust this value if needed (0-255)
-    thresholded = resized.point(lambda x: 255 if x > threshold else 0)
-    
-    return thresholded
+    return image
 
 def find_text_in_video(video_file: str, start_time: float, duration: float, target_text: str, frame_rate: float = 1.0, crop_area=None, save_frames: bool = True) -> tuple[float, float, str]:
     """
